@@ -49,14 +49,20 @@ class wordpress::app (
     notice("Warning: cannot manage the permissions of ${install_dir}, as another resource (perhaps apache::vhost?) is managing it.")
   }
 
+  if $version == 'latest' {
+    $download_filename = "latest.tar.gz"
+  }
+  else {
+    $download_filename = "wordpress-${version}.tar.gz"
+  }
   ## Download and extract
   exec { 'Download wordpress':
-    command => "wget ${install_url}/wordpress-${version}.tar.gz",
-    creates => "${install_dir}/wordpress-${version}.tar.gz",
+    command => "wget ${install_url}/${download_filename}",
+    creates => "${install_dir}/${download_filename}",
     require => File[$install_dir],
   }
   -> exec { 'Extract wordpress':
-    command => "tar zxvf ./wordpress-${version}.tar.gz --strip-components=1",
+    command => "tar zxvf ./${download_filename} --strip-components=1",
     creates => "${install_dir}/index.php",
   }
   ~> exec { 'Change ownership':
